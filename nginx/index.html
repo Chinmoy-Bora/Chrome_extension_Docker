@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Instagram Video Downloader</title>
+  <meta name="description" content="" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .mb-3 {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      margin-bottom: 10px;
+    }
+
+    .form-control {
+      width: 300px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .btn {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 2%;
+    }
+
+    .btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="mb-3">
+      <label for="exampleFormControlInput1" class="form-label">Enter Instagram link</label>
+      <input type="text" class="form-control" id="exampleFormControlInput1"
+        placeholder="Enter Instagram shortcode..." />
+    </div>
+    <button type="button" class="btn btn-primary" onclick="getItem()">Download Video</button>
+    <video id="videoPlayer" controls width="360" height="640">
+      Your browser does not support the video tag.
+    </video>
+
+
+
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+
+    async function getItem() {
+      const item = document.getElementById("exampleFormControlInput1");
+      const url = item.value.trim(); 
+      item.value = ""; 
+
+      const shortcode = extractShortcodeFromUrl(url);
+      if (shortcode) {
+        await sendShortcodeToApi(shortcode);
+      } else {
+        console.error("Invalid URL");
+      }
+    }
+
+    function extractShortcodeFromUrl(url) {
+      
+      const regex = /\/reel\/([A-Za-z0-9_-]+)\//;
+      const match = url.match(regex);
+      if (match && match[1]) {
+        return match[1];
+      } else {
+        console.error("Invalid Instagram URL");
+        return null;
+      }
+    }
+
+    async function sendShortcodeToApi(shortcode) {
+      const apiUrl = "http://localhost:8000/getShortcode";
+
+      try {
+        const response = await axios.get(apiUrl, {
+          params: { shortcode },
+        });
+
+        console.log(response);
+        const videourl = response.data.url
+        console.log(videourl);
+
+
+        const videoPlayer = document.getElementById('videoPlayer');
+        videoPlayer.src = videourl;
+        videoPlayer.load();
+
+      }
+      catch (error) {
+        console.error("Error sending shortcode to API:", error.message);
+      }
+    }
+
+
+  </script>
+</body>
+
+</html>

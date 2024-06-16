@@ -1,0 +1,13 @@
+version: '3'
+services:
+  chrome_ext:
+    build:
+      context: ./node
+    ports:
+      - "8000:8000"
+
+  nginx:
+    build:
+      context: ./nginx
+    ports:
+      - "80:80"
